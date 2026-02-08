@@ -2,6 +2,11 @@
 
 个人学习，bilibili信息获取(纯接口形式直接调用)，不要传播
 
+## Install
+```bash
+pip install bilibili_super
+```
+
 ## Usage
 
 ### login
