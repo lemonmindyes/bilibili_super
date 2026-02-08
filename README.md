@@ -9,7 +9,7 @@
 登录过则会有一个bilibili_cookies.json文件保存cookies，后续不需要二次登录。
 
 ```python
-from src.bilibili_super import BilibiliLogin
+from bilibili_super import BilibiliLogin
 
 Blogin = BilibiliLogin()
 Blogin.login()

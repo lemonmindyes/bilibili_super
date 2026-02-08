@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 import httpx
 
-from src.bilibili_super import DM_COVER_IMG_STR, DM_IMG_STR
+from bilibili_super import DM_COVER_IMG_STR, DM_IMG_STR
 from .config import *
 from .utils import load_cookies, load_cookies_and_uid
 
