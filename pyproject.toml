@@ -1,0 +1,34 @@
+[build-system]
+requires = ['setuptools >= 61.0']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'bilibili-super'
+version = '0.0.1'
+description = '提供bilbili视频平台信息爬取的接口'
+readme = 'README.md'
+requires-python = '>=3.10'
+license = {text = 'Apache-2.0'}
+
+authors = [
+    {name = 'lemonmindyes', email = '1837669410@qq.com'}
+]
+
+dependencies = [
+    'pillow >= 12.1.0',
+    'selenium >= 4.40.0',
+    'httpx >= 0.28.1',
+]
+
+keywords = ['bilibili', 'crawler', 'httpx', 'selenium', 'pillow']
+
+classifiers = [
+    'Programming Language :: Python :: 3'
+]
+
+[project.urls]
+Homepage = 'https://github.com/lemonmindyes/bilibili_super'
+Issues = 'https://github.com/lemonmindyes/bilibili_super/issues'
+
+[tool.setuptools.packages.find]
+where = ['src']
