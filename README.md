@@ -128,3 +128,16 @@ video = BilibiliVideo()
 result = video.get_popular_video(max_page = 5)
 print(f'获取到 {len(result)} 个热门视频')
 ```
+
+#### 5.根据期数获取每周必看
+使用 `BilibiliVideo.get_popular_weekly_video(number = 359)` 
+根据期数获取每周必看，接口会自动分析当前最大期数，如果超出则会弹出，
+运行完毕会自动生成一个number_weekly_video_list.json文件，
+里面包含每周必看视频列表，
+```python
+from bilibili_super import BilibiliVideo
+
+video = BilibiliVideo()
+result = video.get_popular_weekly_video(number = 359)
+print(f'获取到 {len(result)} 个每周必看视频')
+```

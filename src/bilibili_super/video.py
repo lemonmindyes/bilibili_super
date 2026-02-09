@@ -233,6 +233,48 @@ class BilibiliVideo:
             json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 
-    # 获取热门视频
+    # 获取热门视频(https://www.bilibili.com/v/popular/all)
     def get_popular_video(self, max_page: int = 5):
         return asyncio.run(self._fetch_popular_video(max_page))
+
+    # 获取每周必看(https://www.bilibili.com/v/popular/weekly)
+    def get_popular_weekly_video(self, number: int):
+        # 1.获取总期数
+        url = f'https://api.bilibili.com/x/web-interface/popular/series/list'
+        wts = int(time.time())
+        params = {
+            'web_location': '333.934',
+            'wts': wts
+        }
+        base_query = (
+            f'web_location=333.934&wts={wts}'
+        )
+        w_rid = self._sign(base_query)
+        params['w_rid'] = w_rid
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            resp = client.get(url, params = params)
+            resp.raise_for_status()
+            max_number = resp.json()['data']['list'][0]['number']
+            if number > max_number:
+                raise ValueError(f'每周必看第 {number} 期不存在')
+        # 2.获取当期每周必看视频
+        url = f'https://api.bilibili.com/x/web-interface/popular/series/one'
+        wts = int(time.time())
+        params = {
+            'number': number,
+            'web_location': '333.934',
+            'wts': wts
+        }
+        base_query = (
+            f'number={number}&web_location=333.934&wts={wts}'
+        )
+        w_rid = self._sign(base_query)
+        params['w_rid'] = w_rid
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            resp = client.get(url, params = params)
+            resp.raise_for_status()
+            result = resp.json()['data']['list']
+        with open(f'{number}_weekly_video_list.json', 'w', encoding = 'utf-8') as f:
+            json.dump(result, f, ensure_ascii = False, indent = 4)
+        return result
+
