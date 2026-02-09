@@ -98,3 +98,21 @@ video = BilibiliVideo()
 result = video.get_video_info(bvid = 'BV1D7cwzkEFG')
 print(result)
 ```
+
+#### 3.根据oid或bvid获取视频评论(包括二级评论)
+使用 `BilibiliVideo.get_video_comment(oid | bvid, max_page)` 
+根据oid或bvid获取视频评论(包括二级评论), 运行完毕会自动生成一个
+(oid | bvid)_video_comment.json文件，里面包含视频评论，
+爬取页数，默认为最大50，可以修改，如果不满50页，爬取完毕会自动推出。
+```python
+from bilibili_super import BilibiliVideo
+
+video = BilibiliVideo()
+result = video.get_video_comment(oid = 'BV1KMfoBnESY', max_page = 50)
+count = 0
+for v in result:
+    count += 1
+    if v['replies']:
+        count += len(v['replies'])
+print(count)
+```

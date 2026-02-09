@@ -1,6 +1,7 @@
 import asyncio
 import json
 import hashlib
+import math
 import time
 from urllib.parse import quote
 
@@ -25,6 +26,12 @@ class BilibiliVideo:
         md5 = hashlib.md5()
         md5.update(sign_str.encode('utf-8'))
         return md5.hexdigest()
+
+    @staticmethod
+    async def _fetch_json(client: httpx.AsyncClient, url: str):
+        resp = await client.get(url)
+        resp.raise_for_status()
+        return resp.json()
 
     async def _fetch_video_page(self, client: httpx.AsyncClient, query: str, pn: int):
         url = f'https://api.bilibili.com/x/web-interface/wbi/search/type'
@@ -92,6 +99,31 @@ class BilibiliVideo:
             json.dump(all_videos, f, ensure_ascii = False, indent = 4)
         return all_videos
 
+    async def _fetch_second_comment(self, oid: int | str, root: int | str, count: int):
+        pages = math.ceil(count / 10) + 1
+
+        reply_urls = [
+            f'https://api.bilibili.com/x/v2/reply/reply?'
+            f'oid={oid}&'
+            f'type=1&'
+            f'root={root}&'
+            f'ps=10&'
+            f'pn={i}&'
+            f'web_location=333.788'
+            for i in range(1, pages)
+        ]
+
+        async with httpx.AsyncClient(headers = self.headers, timeout = 10.0) as client:
+            tasks = [
+                self._fetch_json(client, url)
+                for url in reply_urls
+            ]
+            results = await asyncio.gather(*tasks)
+        replies = []
+        for r in results:
+            replies.extend(r['data']['replies'])
+        return replies
+
     def search_video(self, query: str, max_page: int = 5):
         return asyncio.run(self._search_video(query, max_page))
 
@@ -111,3 +143,55 @@ class BilibiliVideo:
                 with open(f'{bvid}_video_info.json', 'w', encoding = 'utf-8') as f:
                     json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
             return resp.json()
+
+    def get_video_comment(self, oid: int | str, max_page: int = 50):
+        result = []
+        page = 1
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            pagination_str = '{"offset":""}'
+            while True and page <= max_page:
+                url = 'https://api.bilibili.com/x/v2/reply/wbi/main'
+                wts = int(time.time())
+                params = {
+                    'oid': oid,
+                    'type': 1,
+                    'mode': 3,
+                    'pagination_str': pagination_str,
+                    'plat': 1,
+                    'seek_rpid': '',
+                    'web_location': 1315875,
+                    'wts': wts,
+                }
+                base_query = (
+                    f'mode=3&oid={oid}&'
+                    f'pagination_str={quote(pagination_str, safe = "")}&plat=1&seek_rpid=&'
+                    f'type=1&web_location=1315875&wts={wts}'
+                )
+                w_rid = self._sign(base_query)
+                params['w_rid'] = w_rid
+
+                resp = client.get(url, params = params)
+                resp.raise_for_status()
+                tmp = []
+                if resp.json()['data']['top_replies']:
+                    tmp.extend(resp.json()['data']['top_replies'])
+                tmp.extend(resp.json()['data']['replies'])
+                # 获取二级评论
+                for v in tmp:
+                    if v['count'] > 0:
+                        second_replies = asyncio.run(self._fetch_second_comment(oid, v['rpid'], v['rcount']))
+                        v['replies'] = second_replies
+                    else:
+                        continue
+                result.extend(tmp)
+                if not resp.json()['data']['cursor']['pagination_reply']:
+                    break
+                next_offset = resp.json()['data']['cursor']['pagination_reply']['next_offset']
+                pagination_str = json.dumps({'offset': next_offset})
+                page += 1
+                if page == 2:
+                    del params['seek_rpid']
+
+        with open(f'{oid}_video_comment.json', 'w', encoding = 'utf-8') as f:
+            json.dump(result, f, ensure_ascii = False, indent = 4)
+        return result
