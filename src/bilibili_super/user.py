@@ -76,6 +76,31 @@ class BilibiliUser:
     def get_all_followings(self):
         return asyncio.run(self._get_all_followings())
 
+    def get_user_dynamic(self, max_page: int = 5):
+        result = []
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            params = {
+                'timezone_offset': -480,
+                'type': 'all',
+                'platform': 'web',
+                'features': DYNAMIC_FEATURES,
+                'web_location': 333.1365,
+                'x-bili-device-req-json': '{"platform":"web","device":"pc","spmid":"333.1365"}'
+            }
+            offset = None
+            for i in range(1, max_page + 1):
+                url = f'https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all'
+                params['page'] = i
+                if i != 1:
+                    params['offset'] = offset
+                resp = client.get(url, params = params)
+                resp.raise_for_status()
+                offset = resp.json()['data']['offset']
+                result.extend(resp.json()['data']['items'])
+        with open('dynamic.json', 'w', encoding = 'utf-8') as f:
+            json.dump(result, f, ensure_ascii = False, indent = 4)
+        return result
+
 
 class BilibiliUp:
 
