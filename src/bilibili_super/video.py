@@ -94,3 +94,20 @@ class BilibiliVideo:
 
     def search_video(self, query: str, max_page: int = 5):
         return asyncio.run(self._search_video(query, max_page))
+
+    def get_video_info(self, aid: int = None, bvid: str = None):
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            url = f'https://uapis.cn/api/v1/social/bilibili/videoinfo'
+            if aid is not None:
+                params = {'aid': aid}
+            else:
+                params = {'bvid': bvid}
+            resp = client.get(url, params = params)
+            resp.raise_for_status()
+            if aid is not None:
+                with open(f'{aid}_video_info.json', 'w', encoding = 'utf-8') as f:
+                    json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
+            else:
+                with open(f'{bvid}_video_info.json', 'w', encoding = 'utf-8') as f:
+                    json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
+            return resp.json()

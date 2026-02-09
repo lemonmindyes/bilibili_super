@@ -87,3 +87,14 @@ video = BilibiliVideo()
 result = video.search_video('金可鱼', max_page = 5)
 print(f'获取到 {len(result)} 个视频')
 ```
+
+#### 2.根据aid或bvid获取视频元数据
+使用 `BilibiliVideo.get_video_info(aid | bvid)` 根据aid或bvid获取视频元数据
+运行完毕会自动生成一个(aid | bvid)_video_info.json文件，里面包含视频元数据
+```python
+from bilibili_super import BilibiliVideo
+
+video = BilibiliVideo()
+result = video.get_video_info(bvid = 'BV1D7cwzkEFG')
+print(result)
+```
