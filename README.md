@@ -100,7 +100,7 @@ print(result)
 ```
 
 #### 3.根据oid或bvid获取视频评论(包括二级评论)
-使用 `BilibiliVideo.get_video_comment(oid | bvid, max_page)` 
+使用 `BilibiliVideo.get_video_comment(oid | bvid, max_page = 50)` 
 根据oid或bvid获取视频评论(包括二级评论), 运行完毕会自动生成一个
 (oid | bvid)_video_comment.json文件，里面包含视频评论，
 爬取页数，默认为最大50，可以修改，如果不满50页，爬取完毕会自动推出。
@@ -115,4 +115,16 @@ for v in result:
     if v['replies']:
         count += len(v['replies'])
 print(count)
+```
+
+#### 4.获取热门视频
+使用 `BilibiliVideo.get_popular_video(max_page = 5)` 获取热门视频
+运行完毕会自动生成一个popular_video_list.json文件，
+里面包含热门视频列表，爬取页数，默认为5，可以修改
+```python
+from bilibili_super import BilibiliVideo
+
+video = BilibiliVideo()
+result = video.get_popular_video(max_page = 5)
+print(f'获取到 {len(result)} 个热门视频')
 ```

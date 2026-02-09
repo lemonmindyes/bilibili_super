@@ -124,9 +124,45 @@ class BilibiliVideo:
             replies.extend(r['data']['replies'])
         return replies
 
+    async def _fetch_popular_page(self, client: httpx.AsyncClient, pn: int):
+        url = f'https://api.bilibili.com/x/web-interface/popular'
+        wts = int(time.time())
+        params = {
+            'ps': 20,
+            'pn': pn,
+            'web_location': 333.934,
+            'wts': wts
+        }
+        base_query = (
+            f'pn={pn}&ps=20&'
+            f'web_location=333.934&wts={wts}'
+        )
+        w_rid = self._sign(base_query)
+        params['w_rid'] = w_rid
+        resp = await client.get(url, params = params)
+        resp.raise_for_status()
+        return resp.json()
+
+    async def _fetch_popular_video(self, max_page: int = 5):
+        async with httpx.AsyncClient(headers = self.headers, timeout = 10.0) as client:
+            tasks = [
+                self._fetch_popular_page(client, i)
+                for i in range(1, max_page + 1)
+            ]
+            results = await asyncio.gather(*tasks)
+
+        popular_videos = []
+        for r in results:
+            popular_videos.extend(r['data']['list'])
+        with open(f'popular_video_list.json', 'w', encoding = 'utf-8') as f:
+            json.dump(popular_videos, f, ensure_ascii = False, indent = 4)
+        return popular_videos
+
+    # 根据关键词搜索视频并获取信息
     def search_video(self, query: str, max_page: int = 5):
         return asyncio.run(self._search_video(query, max_page))
 
+    # 根据aid或bvid获取视频元数据
     def get_video_info(self, aid: int = None, bvid: str = None):
         with httpx.Client(headers = self.headers, timeout = 10.0) as client:
             url = f'https://uapis.cn/api/v1/social/bilibili/videoinfo'
@@ -144,6 +180,7 @@ class BilibiliVideo:
                     json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
             return resp.json()
 
+    # 根据oid或bvid获取视频评论(包括二级评论)
     def get_video_comment(self, oid: int | str, max_page: int = 50):
         result = []
         page = 1
@@ -195,3 +232,7 @@ class BilibiliVideo:
         with open(f'{oid}_video_comment.json', 'w', encoding = 'utf-8') as f:
             json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
+
+    # 获取热门视频
+    def get_popular_video(self, max_page: int = 5):
+        return asyncio.run(self._fetch_popular_video(max_page))
