@@ -1,17 +1,43 @@
-# bilibili-super
+# 🔍 bilibili-super
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+![visitors](https://visitor-badge.laobi.icu/badge?page_id=lemonmindyes.bilibili_super)
 
 个人学习，bilibili信息获取(纯接口形式直接调用)，不要传播
 
-## Install
+🎯 **简洁易用** • 🔧 **功能丰富** • 🚀 **高效稳定**
+
+</div>
+
+## 📦 安装
+
 ```bash
 pip install bilibili_super
 ```
 
+> 💡 **提示**: 需要 Python 3.10 或更高版本
+
+## ⚠️ 注意事项
+
+第一次使用请先运行login部分代码，会自动生成 `bilibili_cookies.json` 文件和
+`dm_params.json` 文件，后续任何操作都不需要再次登录。
+
+🔒 **安全提醒**: 请妥善保管生成的配置文件，避免泄露个人信息。
+
 ## Usage
 
-### login
-使用 `BilibiliLogin.login()` 登录，如果没登陆过则会弹出二维码，扫码登录。
-登录过则会有一个bilibili_cookies.json文件保存cookies，后续不需要二次登录。
+### 🔐 登录认证
+
+使用 `BilibiliLogin.login()` 登录，如果没登录过则会弹出二维码，扫码登录。
+登录成功后会自动生成 `bilibili_cookies.json` 文件保存cookies，后续不需要二次登录。
+
+✨ **特性**: 
+- 📱 手机扫码登录
+- 🍪 自动保存Cookie
+- 🔐 安全可靠
 
 ```python
 from bilibili_super import BilibiliLogin
@@ -21,7 +47,7 @@ Blogin.login()
 ```
 
 ### user
-#### 1.获取当前用户关注数
+#### 1️⃣ 获取当前用户关注数
 使用 `BilibiliUser.get_following_count()` 获取当前用户关注数
 ```python
 from bilibili_super import BilibiliUser
@@ -31,9 +57,9 @@ count = user.get_following_count()['data']['following']
 print(count)
 ```
 
-#### 2.获取当前用户关注up列表详细信息
-使用 `BilibiliUser.get_all_followings()` 获取当前用户关注up列表详细信息
-运行完毕会自动生成一个followings.json文件，里面包含所有关注的up详细信息
+#### 2️⃣ 获取当前用户关注UP列表详细信息
+使用 `BilibiliUser.get_all_followings()` 获取当前用户关注UP列表详细信息
+运行完毕会自动生成一个 `followings.json` 文件，里面包含所有关注的UP详细信息
 ```python
 from bilibili_super import BilibiliUser
 
@@ -42,9 +68,9 @@ up_list = user.get_all_followings()
 print(f'关注的up列表条数为：{len(up_list)}')
 ```
 
-#### 3.获取当前用户动态信息
+#### 3️⃣ 获取当前用户动态信息
 使用 `BilibiliUser.get_user_dynamic(max_page = 5)` 获取当前用户动态信息
-运行完毕会自动生成一个dynamic.json文件，里面包含当前用户动态信息，爬取页数，默认为5
+运行完毕会自动生成一个 `dynamic.json` 文件，里面包含当前用户动态信息，爬取页数，默认为5
 ```python
 from bilibili_super import BilibiliUser
 
@@ -53,9 +79,9 @@ dynamic = user.get_user_dynamic(max_page = 5)
 print(f'关注的up动态条数为：{len(dynamic)}')
 ```
 
-#### 4.获取任意up信息
-使用 `BilibiliUp.get_up_info(upname)` 获取任意up信息
-运行完毕会自动生成一个upname.json文件，里面包含该up信息
+#### 4️⃣ 获取任意UP信息
+使用 `BilibiliUp.get_up_info(upname)` 获取任意UP信息
+运行完毕会自动生成一个 `{upname}.json` 文件，里面包含该UP信息
 ```python
 from bilibili_super import BilibiliUp
 
@@ -64,9 +90,9 @@ result = up.get_up_info('金可鱼')
 print(result)
 ```
 
-#### 5.获取任意up的投稿视频列表信息
-使用 `BilibiliUp.get_up_video_list(upname)` 获取任意up的投稿视频列表信息
-运行完毕会自动生成一个upname_video_list.json文件，里面包含该up的投稿视频列表信息
+#### 5️⃣ 获取任意UP的投稿视频列表信息
+使用 `BilibiliUp.get_up_video_list(upname)` 获取任意UP的投稿视频列表信息
+运行完毕会自动生成一个 `{upname}_video_list.json` 文件，里面包含该UP的投稿视频列表信息
 ```python
 from bilibili_super import BilibiliUp
 
@@ -76,9 +102,9 @@ print(f'视频列表数为：{len(result)}')
 ```
 
 ### video
-#### 1.根据关键词搜索视频并获取信息
+#### 1️⃣ 根据关键词搜索视频并获取信息
 使用 `BilibiliVideo.search_video(query, max_page = 5)` 根据关键词搜索视频并获取信息
-运行完毕会自动生成一个query_video_list.json文件，里面包含搜索结果，可以修改
+运行完毕会自动生成一个 `{query}_video_list.json` 文件，里面包含搜索结果，可以修改
 爬取页数，默认为5
 ```python
 from bilibili_super import BilibiliVideo
@@ -88,9 +114,9 @@ result = video.search_video('金可鱼', max_page = 5)
 print(f'获取到 {len(result)} 个视频')
 ```
 
-#### 2.根据aid或bvid获取视频元数据
+#### 2️⃣ 根据aid或bvid获取视频元数据
 使用 `BilibiliVideo.get_video_info(aid | bvid)` 根据aid或bvid获取视频元数据
-运行完毕会自动生成一个(aid | bvid)_video_info.json文件，里面包含视频元数据
+运行完毕会自动生成一个 `{aid|bvid}_video_info.json` 文件，里面包含视频元数据
 ```python
 from bilibili_super import BilibiliVideo
 
@@ -99,11 +125,11 @@ result = video.get_video_info(bvid = 'BV1D7cwzkEFG')
 print(result)
 ```
 
-#### 3.根据oid或bvid获取视频评论(包括二级评论)
+#### 3️⃣ 根据oid或bvid获取视频评论(包括二级评论)
 使用 `BilibiliVideo.get_video_comment(oid | bvid, max_page = 50)` 
 根据oid或bvid获取视频评论(包括二级评论), 运行完毕会自动生成一个
-(oid | bvid)_video_comment.json文件，里面包含视频评论，
-爬取页数，默认为最大50，可以修改，如果不满50页，爬取完毕会自动推出。
+`{oid|bvid}_video_comment.json` 文件，里面包含视频评论，
+爬取页数，默认为最大50，可以修改，如果不满50页，爬取完毕会自动退出。
 ```python
 from bilibili_super import BilibiliVideo
 
@@ -117,7 +143,7 @@ for v in result:
 print(count)
 ```
 
-#### 4.获取热门视频
+#### 4️⃣ 获取热门视频
 使用 `BilibiliVideo.get_popular_video(max_page = 5)` 获取热门视频
 运行完毕会自动生成一个popular_video_list.json文件，
 里面包含热门视频列表，爬取页数，默认为5，可以修改
@@ -129,11 +155,11 @@ result = video.get_popular_video(max_page = 5)
 print(f'获取到 {len(result)} 个热门视频')
 ```
 
-#### 5.根据期数获取每周必看
+#### 5️⃣ 根据期数获取每周必看
 使用 `BilibiliVideo.get_popular_weekly_video(number = 359)` 
-根据期数获取每周必看，接口会自动分析当前最大期数，如果超出则会弹出，
-运行完毕会自动生成一个number_weekly_video_list.json文件，
-里面包含每周必看视频列表，
+根据期数获取每周必看，接口会自动分析当前最大期数，如果超出则会报错，
+运行完毕会自动生成一个 `{number}_weekly_video_list.json` 文件，
+里面包含每周必看视频列表
 ```python
 from bilibili_super import BilibiliVideo
 
