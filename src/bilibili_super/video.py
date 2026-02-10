@@ -3,6 +3,7 @@ import json
 import hashlib
 import math
 import time
+import xml.etree.ElementTree as ET
 from urllib.parse import quote
 
 import httpx
@@ -83,7 +84,7 @@ class BilibiliVideo:
         resp.raise_for_status()
         return resp.json()
 
-    async def _search_video(self, query: str, max_page: int = 5):
+    async def _search_video(self, query: str, max_page: int = 5, is_save: bool = True):
         async with httpx.AsyncClient(headers = self.headers, timeout = 10.0) as client:
             tasks = [
                 self._fetch_video_page(client, query, pn)
@@ -95,8 +96,9 @@ class BilibiliVideo:
         for r in results:
             vlist = r['data']['result']
             all_videos.extend(vlist)
-        with open(f'{query}_video_list.json', 'w', encoding = 'utf-8') as f:
-            json.dump(all_videos, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'{query}_video_list.json', 'w', encoding = 'utf-8') as f:
+                json.dump(all_videos, f, ensure_ascii = False, indent = 4)
         return all_videos
 
     async def _fetch_second_comment(self, oid: int | str, root: int | str, count: int):
@@ -143,7 +145,7 @@ class BilibiliVideo:
         resp.raise_for_status()
         return resp.json()
 
-    async def _fetch_popular_video(self, max_page: int = 5):
+    async def _fetch_popular_video(self, max_page: int = 5, is_save: bool = True):
         async with httpx.AsyncClient(headers = self.headers, timeout = 10.0) as client:
             tasks = [
                 self._fetch_popular_page(client, i)
@@ -154,16 +156,17 @@ class BilibiliVideo:
         popular_videos = []
         for r in results:
             popular_videos.extend(r['data']['list'])
-        with open(f'popular_video_list.json', 'w', encoding = 'utf-8') as f:
-            json.dump(popular_videos, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'popular_video_list.json', 'w', encoding = 'utf-8') as f:
+                json.dump(popular_videos, f, ensure_ascii = False, indent = 4)
         return popular_videos
 
     # 根据关键词搜索视频并获取信息
-    def search_video(self, query: str, max_page: int = 5):
-        return asyncio.run(self._search_video(query, max_page))
+    def search_video(self, query: str, max_page: int = 5, is_save: bool = True):
+        return asyncio.run(self._search_video(query, max_page, is_save))
 
     # 根据aid或bvid获取视频元数据
-    def get_video_info(self, aid: int = None, bvid: str = None):
+    def get_video_info(self, aid: int = None, bvid: str = None, is_save: bool = True):
         with httpx.Client(headers = self.headers, timeout = 10.0) as client:
             url = f'https://uapis.cn/api/v1/social/bilibili/videoinfo'
             if aid is not None:
@@ -172,16 +175,17 @@ class BilibiliVideo:
                 params = {'bvid': bvid}
             resp = client.get(url, params = params)
             resp.raise_for_status()
-            if aid is not None:
-                with open(f'{aid}_video_info.json', 'w', encoding = 'utf-8') as f:
-                    json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
-            else:
-                with open(f'{bvid}_video_info.json', 'w', encoding = 'utf-8') as f:
-                    json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
+            if is_save:
+                if aid is not None:
+                    with open(f'{aid}_video_info.json', 'w', encoding = 'utf-8') as f:
+                        json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
+                else:
+                    with open(f'{bvid}_video_info.json', 'w', encoding = 'utf-8') as f:
+                        json.dump(resp.json(), f, ensure_ascii = False, indent = 4)
             return resp.json()
 
     # 根据oid或bvid获取视频评论(包括二级评论)
-    def get_video_comment(self, oid: int | str, max_page: int = 50):
+    def get_video_comment(self, oid: int | str, max_page: int = 50, is_save: bool = True):
         result = []
         page = 1
         with httpx.Client(headers = self.headers, timeout = 10.0) as client:
@@ -228,17 +232,17 @@ class BilibiliVideo:
                 page += 1
                 if page == 2:
                     del params['seek_rpid']
-
-        with open(f'{oid}_video_comment.json', 'w', encoding = 'utf-8') as f:
-            json.dump(result, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'{oid}_video_comment.json', 'w', encoding = 'utf-8') as f:
+                json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 
     # 获取热门视频(https://www.bilibili.com/v/popular/all)
-    def get_popular_video(self, max_page: int = 5):
-        return asyncio.run(self._fetch_popular_video(max_page))
+    def get_popular_video(self, max_page: int = 5, is_save: bool = True):
+        return asyncio.run(self._fetch_popular_video(max_page, is_save))
 
     # 获取每周必看视频(https://www.bilibili.com/v/popular/weekly)
-    def get_popular_weekly_video(self, number: int):
+    def get_popular_weekly_video(self, number: int, is_save: bool = True):
         # 1.获取总期数
         url = f'https://api.bilibili.com/x/web-interface/popular/series/list'
         wts = int(time.time())
@@ -274,12 +278,13 @@ class BilibiliVideo:
             resp = client.get(url, params = params)
             resp.raise_for_status()
             result = resp.json()['data']['list']
-        with open(f'{number}_weekly_video_list.json', 'w', encoding = 'utf-8') as f:
-            json.dump(result, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'{number}_weekly_video_list.json', 'w', encoding = 'utf-8') as f:
+                json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 
     # 获取入站必刷视频(https://www.bilibili.com/v/popular/history)
-    def get_popular_history_video(self):
+    def get_popular_history_video(self, is_save: bool = True):
         url = f'https://api.bilibili.com/x/web-interface/popular/precious'
         wts = int(time.time())
         params = {
@@ -297,12 +302,13 @@ class BilibiliVideo:
             resp = client.get(url, params = params)
             resp.raise_for_status()
             result = resp.json()['data']['list']
-        with open(f'popular_history_video_list.json', 'w', encoding = 'utf-8') as f:
-            json.dump(result, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'popular_history_video_list.json', 'w', encoding = 'utf-8') as f:
+                json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 
     # 获取排行榜，网站动态更新(https://www.bilibili.com/v/popular/rank)
-    def get_popular_rank(self, query: str = 'all'):
+    def get_popular_rank(self, query: str = 'all', is_save: bool = True):
         """
         Args:
             query (str):
@@ -327,6 +333,8 @@ class BilibiliVideo:
                 fashion: 时尚美妆
                 sports: 体育运动
                 animal: 动物
+            is_save (bool):
+                是否自动保存结果文件
         """
         if query in ['all', 'douga', 'game', 'kichiku', 'music', 'dance', 'cinephile', 'ent', 'knowledge', 'tech',
                      'food', 'car', 'fashion', 'sports', 'animal']:
@@ -365,7 +373,29 @@ class BilibiliVideo:
             resp = client.get(url, params = params)
             resp.raise_for_status()
             result = resp.json()['data']['list']
-        with open(f'{query}_rank_list.json', 'w', encoding = 'utf-8') as f:
-            json.dump(result, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'{query}_rank_list.json', 'w', encoding = 'utf-8') as f:
+                json.dump(result, f, ensure_ascii = False, indent = 4)
+        return result
+
+    # 根据aid或bvid获取视频弹幕
+    def get_video_danmu(self, aid: str = None, bvid: str = None, is_save: bool = True):
+        video_info = self.get_video_info(aid = aid, bvid = bvid, is_save = is_save)
+        cid = video_info['cid']
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            url = f'https://comment.bilibili.com/{cid}.xml'
+            resp = client.get(url)
+            resp.raise_for_status()
+        root = ET.fromstring(resp.text)
+        result = []
+        for d in root.findall('d'):
+            result.append(d.text)
+        if is_save:
+            if aid is not None:
+                with open(f'{aid}_danmu.txt', 'w', encoding = 'utf-8') as f:
+                    f.write('\n'.join(result))
+            else:
+                with open(f'{bvid}_danmu.txt', 'w', encoding = 'utf-8') as f:
+                    f.write('\n'.join(result))
         return result
 
