@@ -79,7 +79,17 @@ dynamic = user.get_user_dynamic(max_page = 5)
 print(f'关注的up动态条数为：{len(dynamic)}')
 ```
 
-#### 4️⃣ 获取任意UP信息
+#### 4️⃣ 获取用户的关注数和粉丝数
+使用 `BilibiliUser.get_relation_state()` 获取当前用户关注数和粉丝数
+```python
+from bilibili_super import BilibiliUser
+
+user = BilibiliUser()
+relation_state = user.get_relation_state()
+print(relation_state)
+```
+
+#### 5️⃣ 获取任意UP信息
 使用 `BilibiliUp.get_up_info(upname)` 获取任意UP信息
 运行完毕会自动生成一个 `{upname}.json` 文件，里面包含该UP信息
 ```python
@@ -90,7 +100,7 @@ result = up.get_up_info('金可鱼')
 print(result)
 ```
 
-#### 5️⃣ 获取任意UP的投稿视频列表信息
+#### 6️⃣ 获取任意UP的投稿视频列表信息
 使用 `BilibiliUp.get_up_video_list(upname)` 获取任意UP的投稿视频列表信息
 运行完毕会自动生成一个 `{upname}_video_list.json` 文件，里面包含该UP的投稿视频列表信息
 ```python

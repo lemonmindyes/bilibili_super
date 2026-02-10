@@ -101,6 +101,16 @@ class BilibiliUser:
             json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 
+    def get_relation_state(self):
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            url = f'https://api.bilibili.com/x/relation/stat'
+            params = {
+                'vmid': self.uid
+            }
+            response = client.get(url, params = params)
+            response.raise_for_status()
+            return response.json()
+
 
 class BilibiliUp:
 
