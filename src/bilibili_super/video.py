@@ -237,7 +237,7 @@ class BilibiliVideo:
     def get_popular_video(self, max_page: int = 5):
         return asyncio.run(self._fetch_popular_video(max_page))
 
-    # 获取每周必看(https://www.bilibili.com/v/popular/weekly)
+    # 获取每周必看视频(https://www.bilibili.com/v/popular/weekly)
     def get_popular_weekly_video(self, number: int):
         # 1.获取总期数
         url = f'https://api.bilibili.com/x/web-interface/popular/series/list'
@@ -275,6 +275,29 @@ class BilibiliVideo:
             resp.raise_for_status()
             result = resp.json()['data']['list']
         with open(f'{number}_weekly_video_list.json', 'w', encoding = 'utf-8') as f:
+            json.dump(result, f, ensure_ascii = False, indent = 4)
+        return result
+
+    # 获取入站必刷视频(https://www.bilibili.com/v/popular/history)
+    def get_popular_history_video(self):
+        url = f'https://api.bilibili.com/x/web-interface/popular/precious'
+        wts = int(time.time())
+        params = {
+            'page_size': 100,
+            'page': 1,
+            'web_location': '333.934',
+            'wts': wts
+        }
+        base_query = (
+            f'page=1&page_size=100&web_location=333.934&wts={wts}'
+        )
+        w_rid = self._sign(base_query)
+        params['w_rid'] = w_rid
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            resp = client.get(url, params = params)
+            resp.raise_for_status()
+            result = resp.json()['data']['list']
+        with open(f'popular_history_video_list.json', 'w', encoding = 'utf-8') as f:
             json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 

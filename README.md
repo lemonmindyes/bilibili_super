@@ -167,3 +167,15 @@ video = BilibiliVideo()
 result = video.get_popular_weekly_video(number = 359)
 print(f'获取到 {len(result)} 个每周必看视频')
 ```
+
+#### 6️⃣ 获取入站必刷视频
+使用 `BilibiliVideo.get_popular_history_video()` 获取入站必刷视频
+运行完毕会自动生成一个popular_history_video_list.json文件，
+里面包含入站必刷视频列表
+```python
+from bilibili_super import BilibiliVideo
+
+video = BilibiliVideo()
+result = video.get_popular_history_video()
+print(f'获取到 {len(result)} 个入站必刷视频')
+```
