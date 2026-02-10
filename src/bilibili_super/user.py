@@ -43,7 +43,7 @@ class BilibiliUser:
         response.raise_for_status()
         return response.json()
 
-    async def _get_all_followings(self):
+    async def _get_all_followings(self, is_save: bool = True):
         async with httpx.AsyncClient(headers = self.headers, timeout = 10.0) as client:
             # 1. 获取关注数
             total = self.get_following_count()
@@ -61,8 +61,9 @@ class BilibiliUser:
         for page in pages:
             items = page.get('data', {}).get('list', [])
             all_followings.extend(items)
-        with open('followings.json', 'w', encoding = 'utf-8') as f:
-            json.dump(all_followings, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open('followings.json', 'w', encoding = 'utf-8') as f:
+                json.dump(all_followings, f, ensure_ascii = False, indent = 4)
         return all_followings
 
     def get_following_count(self):
@@ -73,10 +74,10 @@ class BilibiliUser:
             response.raise_for_status()
             return response.json()
 
-    def get_all_followings(self):
-        return asyncio.run(self._get_all_followings())
+    def get_all_followings(self, is_save: bool = True):
+        return asyncio.run(self._get_all_followings(is_save))
 
-    def get_user_dynamic(self, max_page: int = 5):
+    def get_user_dynamic(self, max_page: int = 5, is_save: bool = True):
         result = []
         with httpx.Client(headers = self.headers, timeout = 10.0) as client:
             params = {
@@ -97,8 +98,9 @@ class BilibiliUser:
                 resp.raise_for_status()
                 offset = resp.json()['data']['offset']
                 result.extend(resp.json()['data']['items'])
-        with open('dynamic.json', 'w', encoding = 'utf-8') as f:
-            json.dump(result, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open('dynamic.json', 'w', encoding = 'utf-8') as f:
+                json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 
     def get_relation_state(self):
@@ -170,8 +172,8 @@ class BilibiliUp:
         resp.raise_for_status()
         return resp.json()
 
-    async def _get_up_video_list(self, up_name: str):
-        up_info = self.get_up_info(up_name)
+    async def _get_up_video_list(self, up_name: str, is_save: bool = True):
+        up_info = self.get_up_info(up_name, is_save)
         mid = up_info['mid']
         videos = up_info['videos']
 
@@ -189,11 +191,12 @@ class BilibiliUp:
         for r in results:
             vlist = r['data']['list']['vlist']
             all_videos.extend(vlist)
-        with open(f'{up_name}_video_list.json', 'w', encoding = 'utf-8') as f:
-            json.dump(all_videos, f, ensure_ascii = False, indent = 4)
+        if is_save:
+            with open(f'{up_name}_video_list.json', 'w', encoding = 'utf-8') as f:
+                json.dump(all_videos, f, ensure_ascii = False, indent = 4)
         return all_videos
 
-    def get_up_info(self, up_name: str):
+    def get_up_info(self, up_name: str, is_save: bool = True):
         wts = int(time.time())
 
         base_query = (
@@ -248,9 +251,10 @@ class BilibiliUp:
             resp = client.get(url, params = params, headers = self.headers)
             resp.raise_for_status()
             result = resp.json()['data']['result'][0]
+        if is_save:
             with open(f'{up_name}.json', 'w', encoding = 'utf-8') as f:
                 json.dump(result, f, ensure_ascii = False, indent = 4)
-            return result
+        return result
 
-    def get_up_video_list(self, up_name: str):
-        return asyncio.run(self._get_up_video_list(up_name))
+    def get_up_video_list(self, up_name: str, is_save: bool = True):
+        return asyncio.run(self._get_up_video_list(up_name, is_save))
