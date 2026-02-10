@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 import httpx
 
-from .config import EDGE_UA, MIXIN_KEY
+from .config import EDGE_UA, MIXIN_KEY, RANK_MAP
 from .utils import load_cookies
 
 
@@ -298,6 +298,74 @@ class BilibiliVideo:
             resp.raise_for_status()
             result = resp.json()['data']['list']
         with open(f'popular_history_video_list.json', 'w', encoding = 'utf-8') as f:
+            json.dump(result, f, ensure_ascii = False, indent = 4)
+        return result
+
+    # 获取排行榜，网站动态更新(https://www.bilibili.com/v/popular/rank)
+    def get_popular_rank(self, query: str = 'all'):
+        """
+        Args:
+            query (str):
+                all: 全部
+                anime: 番剧
+                guochuang: 国创
+                documentary: 纪录片
+                movie: 电影
+                tv: 电视剧
+                variety: 综艺
+                douga: 动画
+                game: 游戏
+                kichiku: 鬼畜
+                music: 音乐
+                dance: 舞蹈
+                cinephile: 影视
+                ent: 娱乐
+                zhishi: 知识
+                tech: 科技数码
+                food: 美食
+                car: 汽车
+                fashion: 时尚美妆
+                sports: 体育运动
+                animal: 动物
+        """
+        if query in ['all', 'douga', 'game', 'kichiku', 'music', 'dance', 'cinephile', 'ent', 'knowledge', 'tech',
+                     'food', 'car', 'fashion', 'sports', 'animal']:
+            url = f'https://api.bilibili.com/x/web-interface/ranking/v2'
+            wts = int(time.time())
+            rid = RANK_MAP[query]
+            params = {
+                'rid': rid,
+                'type': 'all',
+                'web_location': '333.934',
+                'wts': wts
+            }
+            base_query = (
+                f'rid={rid}&type=all&web_location=333.934&wts={wts}'
+            )
+            w_rid = self._sign(base_query)
+            params['w_rid'] = w_rid
+        elif query in ['anime', 'guochuang', 'documentary', 'movie', 'tv', 'variety']:
+            url = f'https://api.bilibili.com/pgc/season/rank/web/list'
+            wts = int(time.time())
+            season_type = RANK_MAP[query]
+            params = {
+                'day': 3,
+                'season_type': season_type,
+                'web_location': '333.934',
+                'wts': wts
+            }
+            base_query = (
+                f'day=3&season_type={season_type}&web_location=333.934&wts={wts}'
+            )
+            w_rid = self._sign(base_query)
+            params['w_rid'] = w_rid
+        else:
+            raise ValueError(f'{query} 不存在于排行榜类型')
+        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
+            resp = client.get(url, params = params)
+            resp.raise_for_status()
+            result = resp.json()['data']['list']
+        with open(f'{query}_rank_list.json', 'w', encoding = 'utf-8') as f:
             json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
 

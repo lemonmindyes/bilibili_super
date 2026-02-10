@@ -179,3 +179,18 @@ video = BilibiliVideo()
 result = video.get_popular_history_video()
 print(f'获取到 {len(result)} 个入站必刷视频')
 ```
+
+#### 7️⃣ 获取排行榜视频
+使用 `BilibiliVideo.get_popular_rank(query = 'all')` 获取排行榜视频
+运行完毕会自动生成一个 `{query}_rank_list.json` 文件，
+query参数可以参考`https://www.bilibili.com/v/popular/rank/all`
+和`https://www.bilibili.com/v/popular/rank/anime`
+的末尾参数，也可以用ctrl查看函数有参数介绍
+```python
+from bilibili_super import BilibiliVideo
+
+video = BilibiliVideo()
+query = 'meishi'
+result = video.get_popular_rank(query = query)
+print(f'获取到 {len(result)} 个{query}排行榜视频')
+```

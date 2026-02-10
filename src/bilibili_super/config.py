@@ -17,3 +17,28 @@ DM_IMG_LIST = '[{"x":2628,"y":-2200,"z":0,"timestamp":23363,"k":60,"type":0},{"x
 
 # user
 DYNAMIC_FEATURES = 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete,onlyfansQaCard,commentsNewVersion,avatarAutoTheme,sunflowerStyle,cardsEnhance,eva3CardOpus,eva3CardVideo,eva3CardComment,eva3CardVote,eva3CardUser'
+
+# video
+RANK_MAP = {
+    'all': 0,
+    'anime': 1,
+    'movie': 2,
+    'documentary': 3,
+    'guochuang': 4,
+    'tv': 5,
+    'variety': 7,
+    'cinephile': 1001,
+    'ent': 1002,
+    'music': 1003,
+    'dance': 1004,
+    'douga': 1005,
+    'kichiku': 1007,
+    'game': 1008,
+    'knowledge': 1010,
+    'tech': 1012,
+    'car': 1013,
+    'fashion': 1014,
+    'sports': 1018,
+    'food': 1020,
+    'animal': 1024
+}
