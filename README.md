@@ -190,7 +190,7 @@ query参数可以参考`https://www.bilibili.com/v/popular/rank/all`
 from bilibili_super import BilibiliVideo
 
 video = BilibiliVideo()
-query = 'meishi'
+query = 'all'
 result = video.get_popular_rank(query = query)
 print(f'获取到 {len(result)} 个{query}排行榜视频')
 ```
