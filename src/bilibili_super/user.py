@@ -46,7 +46,7 @@ class BilibiliUser:
     async def _get_all_followings(self, is_save: bool = True):
         async with httpx.AsyncClient(headers = self.headers, timeout = 10.0) as client:
             # 1. 获取关注数
-            total = self.get_following_count()
+            total = self.get_following_state()
             total = total['data']['following']
 
             # 2. 构造分页 URL
@@ -66,7 +66,7 @@ class BilibiliUser:
                 json.dump(all_followings, f, ensure_ascii = False, indent = 4)
         return all_followings
 
-    def get_following_count(self):
+    def get_following_state(self):
         with httpx.Client(headers = self.headers, timeout = 10.0) as client:
             url = f'https://api.bilibili.com/x/relation/stat'
             params = {'vmid': self.uid}
@@ -102,16 +102,6 @@ class BilibiliUser:
             with open('dynamic.json', 'w', encoding = 'utf-8') as f:
                 json.dump(result, f, ensure_ascii = False, indent = 4)
         return result
-
-    def get_relation_state(self):
-        with httpx.Client(headers = self.headers, timeout = 10.0) as client:
-            url = f'https://api.bilibili.com/x/relation/stat'
-            params = {
-                'vmid': self.uid
-            }
-            response = client.get(url, params = params)
-            response.raise_for_status()
-            return response.json()
 
 
 class BilibiliUp:
