@@ -146,6 +146,8 @@
 
 ## 请求参数
 
+#### Query
+
 |         参数名         |  类型  | 必填 |  默认值  |            描述            |
 | :--------------------: | :----: | :--: | :------: | :------------------------: |
 |    timezone_offset     |  int   |  是  |   -480   |         时区偏移量         |
@@ -168,9 +170,9 @@
 
 | 字段名  |  类型  |      描述       |
 | :-----: | :----: | :-------------: |
-|  code   |  int   |  基础索引信息   |
-|  data   | object |  动态自身的 ID  |
-| message | string | ⭐动态的主体数据 |
+|  code   |  int   |     状态码      |
+|  data   | object | ⭐动态的主体数据 |
+| message | string |    提示信息     |
 |   ttl   |  int   |    缓存时间     |
 
 #### data字段
@@ -301,5 +303,328 @@
     },
     "topic": null // 动态话题信息（如#话题#，当前为空）
 }
+```
+
+## 4.获取任意UP信息
+
+### 接口基本信息
+
+```text
+接口名称：获取任意UP信息
+请求方式：GET
+请求地址：https://api.bilibili.com/x/web-interface/wbi/search/type
+库中接口：BilibiliUp().get_up_info('金可鱼', is_save = True)
+```
+
+## 请求参数
+
+#### Query参数
+
+|     参数名      |  类型  | 必填 |  默认值   |                         描述                         |
+| :-------------: | :----: | :--: | :-------: | :--------------------------------------------------: |
+|   category_id   | string |  是  |           |              分类ID（用户搜索一般为空）              |
+|   search_type   | string |  是  | bili_user |                 搜索类型（用户搜索）                 |
+|   ad_resource   | string |  是  |   5646    |                                                      |
+|   __refresh__   | string |  是  |   true    |                   是否刷新请求标识                   |
+|     _extra      | string |  是  |           |                                                      |
+|     context     | string |  是  |           |                                                      |
+|      page       |  int   |  是  |     1     |            ⭐页码（这个场景下请不要修改）             |
+|    page_size    |  int   |  是  |    36     |        ⭐每页返回数量（这个场景下请不要修改）         |
+|      order      | string |  是  |           |                 排序方式（默认综合）                 |
+| pubtime_begin_s |  int   |  是  |     0     |                                                      |
+|  pubtime_end_s  |  int   |  是  |     0     |                                                      |
+|    duration     | string |  是  |           |                                                      |
+|   from_source   | string |  是  |           |                                                      |
+|   from_spmid    | string |  是  |  333.337  |                                                      |
+|    platform     | string |  是  |    pc     |                    客户端平台类型                    |
+|    highlight    |  int   |  是  |     1     |                                                      |
+|  single_column  |  int   |  是  |           |                                                      |
+|     keyword     | string |  是  |           |                ⭐搜索关键词（用户名）                 |
+|      qv_id      | string |  是  |  随机值   | 查询追踪ID（默认：GMGeuAPZk7exW8ZwU4tarBMlgQYPqN71） |
+|   source_tag    | string |  是  |     3     |                                                      |
+|   gaia_vtoken   | string |  是  |           |                                                      |
+|   order_sort    |  int   |  是  |     0     |                                                      |
+|    user_type    |  int   |  是  |     0     |                                                      |
+| dynamic_offset  |  int   |  是  |     0     |                                                      |
+|  web_location   | string |  是  |  1430654  |                                                      |
+|      w_rid      | string |  是  |           |                 ⭐签名参数（WBI签名）                 |
+|       wts       |  int   |  是  | 当前时间  |                  ⭐时间戳（签名用）                   |
+
+#### Header参数
+
+|   参数名   |  类型  | 必填 |    描述    |
+| :--------: | :----: | :--: | :--------: |
+| User-Agent | string |  是  |  用户代理  |
+|   Cookie   | string |  是  | 用户Cookie |
+
+### 返回参数说明
+
+| 字段名  |  类型  |      描述       |
+| :-----: | :----: | :-------------: |
+|  code   |  int   |     状态码      |
+|  data   | object | ⭐动态的主体数据 |
+| message | string |    提示信息     |
+|   ttl   |  int   |    缓存时间     |
+
+#### data字段
+
+|     字段名      |  类型  |        描述         |
+| :-------------: | :----: | :-----------------: |
+|      seid       | string |     搜索会话ID      |
+|      page       |  int   |      ⭐当前页码      |
+|    pagesize     |  int   | ⭐每页返回的结果数量 |
+|   numResults    |  int   |    搜索结果总数     |
+|    numPages     |  int   |       总页数        |
+| suggest_keyword | string |                     |
+|    rqt_type     | string |      请求类型       |
+|    exp_list     | object |  实验参数（忽略）   |
+|     egg_hit     |  int   |      彩蛋标识       |
+|     result      | object |    ⭐搜索结果列表    |
+|   show_column   |  int   |      展示模式       |
+|  in_black_key   |  int   |                     |
+|  in_white_key   |  int   |                     |
+
+#### result字段
+
+```json
+{
+    "type": "bili_user", // 结果类型（固定为用户搜索结果）
+    "mid": 588753764, // ⭐用户ID（唯一标识）
+    "uname": "金可鱼", // ⭐用户名
+    "usign": "忍耐到底，必然得救。\n微博：-金可鱼-  \n商务2663616010@qq.com ", // ⭐用户个性签名
+    "fans": 227097, // ⭐粉丝数
+    "videos": 173, // ⭐投稿视频数量
+    "upic": "//i0.hdslb.com/bfs/face/5273b00710f6abf2ea7b7603ed6539f40cbfc781.jpg", // ⭐用户头像URL
+    "face_nft": 0,
+    "face_nft_type": 0,
+    "verify_info": "",
+    "level": 6, // 用户等级（1~6级）
+    "gender": 2, // 性别（1=男，2=女）
+    "is_upuser": 1, // 是否为UP主（0=不是，1=是）
+    "is_live": 0, // 是否正在直播（0=不在直播中，1=直播中）
+    "room_id": 24479157, // 直播间ID（若存在）
+    "res": [ // ⭐代表性视频列表（通常为最近或热门投稿）只展示三个
+      {
+        "aid": 116041023889041, // ⭐视频AV号
+        "bvid": "BV1sNcgz9E4p", // ⭐视频BV号
+        "title": "青春的感觉", // ⭐视频标题
+        "pubdate": 1770646076, // ⭐发布时间戳（秒）
+        "arcurl": "http://www.bilibili.com/video/av116041023889041", // ⭐视频跳转链接
+        "pic": "//i1.hdslb.com/bfs/archive/54394bd64a7bc73fb6d99fb04c35f173c5c73dec.jpg", // ⭐视频封面
+        "play": "24790", // ⭐播放量
+        "dm": 26, // ⭐弹幕数
+        "coin": 119, // ⭐投币数
+        "fav": 231, // ⭐收藏数
+        "desc": "-", // ⭐视频简介
+        "duration": "2:43", // ⭐视频时长
+        "is_pay": 0,
+        "is_union_video": 0,
+        "is_charge_video": 0,
+        "vt": 0,
+        "enable_vt": 0,
+        "vt_display": ""
+      },
+      {
+        "aid": 115983142360244,
+        "bvid": "BV11C6vB3EBN",
+        "title": "狐主任：原来你也好这口…",
+        "pubdate": 1770386400,
+        "arcurl": "http://www.bilibili.com/video/av115983142360244",
+        "pic": "//i2.hdslb.com/bfs/archive/590b3d3813823528c84c290dea89b2eb31ab276a.jpg",
+        "play": "35659",
+        "dm": 32,
+        "coin": 131,
+        "fav": 222,
+        "desc": "-",
+        "duration": "2:47",
+        "is_pay": 0,
+        "is_union_video": 0,
+        "is_charge_video": 0,
+        "vt": 0,
+        "enable_vt": 0,
+        "vt_display": ""
+      },
+      {
+        "aid": 115984518157684,
+        "bvid": "BV13z6zBhEiB",
+        "title": "我也妹眨眼啊",
+        "pubdate": 1769783449,
+        "arcurl": "http://www.bilibili.com/video/av115984518157684",
+        "pic": "//i2.hdslb.com/bfs/archive/434e1bf7bde151fce911dd14cdf9b7abd784535c.jpg",
+        "play": "34925",
+        "dm": 16,
+        "coin": 220,
+        "fav": 271,
+        "desc": "-",
+        "duration": "1:57",
+        "is_pay": 0,
+        "is_union_video": 0,
+        "is_charge_video": 0,
+        "vt": 0,
+        "enable_vt": 0,
+        "vt_display": ""
+      }
+    ],
+    "official_verify": { // ⭐官方认证字段
+      "type": 0, // 认证类型（-1：无认证、0：个人认证、1、机构认证）
+      "desc": "bilibili 知名UP主" // 认证说明
+    },
+    "hit_columns": [
+
+    ],
+    "is_senior_member": 0
+},
+```
+
+## 5.获取任意up的投稿视频列表信息（只整合vlist数据进行返回）
+
+### 接口基本信息
+
+```text
+接口名称：获取任意up的投稿视频列表信息
+请求方式：GET
+请求地址：https://api.bilibili.com/x/space/wbi/arc/search
+库中接口：BilibiliUp().get_up_video_list('金可鱼', is_save = True)
+```
+
+## 请求参数
+
+#### Query参数
+
+|      参数名      |  类型  | 必填 |   默认值   |               描述                |
+| :--------------: | :----: | :--: | :--------: | :-------------------------------: |
+|        pn        |  int   |  是  |     1      |               ⭐页码               |
+|        ps        |  int   |  是  |     40     |           ⭐每页返回数量           |
+|       tid        |  int   |  是  |     0      |                                   |
+|   special_type   | string |  是  |            |                                   |
+|      order       | string |  是  |  pubdate   | 排序方式，如：pubdate（发布时间） |
+|       mid        |  int   |  是  |            |        ⭐用户ID（唯一标识）        |
+|      index       |  int   |  是  |     0      |                                   |
+|     keyword      | string |  是  |            |                                   |
+|  order_avoided   |  bool  |  是  |    true    |       是否避免默认排序策略        |
+|     platform     | string |  是  |    web     |             平台类型              |
+|   web_location   | string |  是  |  333.1387  |                                   |
+|   dm_img_list    | string |  是  |            |      浏览器指纹轨迹数据列表       |
+|    dm_img_str    | string |  是  |            |        WebGL 渲染信息指纹         |
+| dm_cover_img_str | string |  是  |            |         GPU/显卡相关指纹          |
+|   dm_img_inter   | string |  是  |            |         页面交互行为数据          |
+|      w_rid       | string |  是  |            |          ⭐WBI 签名校验值          |
+|       wts        |  int   |  是  | 当前时间戳 |          ⭐WBI 时间戳参数          |
+
+#### Header参数
+
+|   参数名   |  类型  | 必填 |    描述    |
+| :--------: | :----: | :--: | :--------: |
+| User-Agent | string |  是  |  用户代理  |
+|   Cookie   | string |  是  | 用户Cookie |
+
+### 返回参数说明
+
+| 字段名  |  类型  |   描述    |
+| :-----: | :----: | :-------: |
+|  code   |  int   |  状态码   |
+|  data   | object | ⭐主体数据 |
+| message | string | 提示信息  |
+|   ttl   |  int   | 缓存时间  |
+
+#### data字段
+
+|     字段名      |  类型  |               描述                |
+| :-------------: | :----: | :-------------------------------: |
+| episodic_button | object |                                   |
+|    gaia_data    |  null  |                                   |
+|  gaia_res_type  |  int   | Gaia 风控响应类型，0 表示正常状态 |
+|     is_risk     |  bool  |       是否被判定为风险请求        |
+|      list       | object |           ⭐投稿信息列表           |
+|      page       | object | ⭐分页信息（页码、每页数量、总数） |
+
+#### list字段
+
+| 字段名 |  类型  |                  描述                   |
+| :----: | :----: | :-------------------------------------: |
+| slist  |  list  |                                         |
+| tlist  | object |  ⭐分区统计信息，表示各分区下的视频数量  |
+| vlist  |  list  | ⭐实际的视频详细列表数据（核心数据字段） |
+
+#### tlist
+
+```json
+"tlist": {
+    "155": {
+        "tid": 155, // B站视频所属的分区（内容分类）ID
+        "count": 6,
+        "name": "时尚"
+    },
+    "160": {
+        "tid": 160,
+        "count": 151,
+        "name": "生活"
+    },
+    "188": {
+        "tid": 188,
+        "count": 5,
+        "name": "科技"
+    },
+    "223": {
+        "tid": 223,
+        "count": 1,
+        "name": "汽车"
+    },
+    "36": {
+        "tid": 36,
+        "count": 6,
+        "name": "知识"
+    },
+    "4": {
+        "tid": 4,
+        "count": 4,
+        "name": "游戏"
+    }
+},
+```
+
+#### vlist(list里面有同样的很多object，介绍其中一个)
+
+```json
+{
+    "comment": 495, // ⭐ 评论数量
+    "typeid": 21, // ⭐ 视频子分区ID
+    "play": 353826, // ⭐ 播放量
+    "pic": "http://i0.hdslb.com/bfs/archive/5b5cd650b9e3c6cb46bd252746f0ee49ed32a69f.jpg", // ⭐ 视频封面URL
+    "subtitle": "",
+    "description": "谢谢这位宝子！好看！喜欢！", // ⭐ 视频描述
+    "copyright": "1", // ⭐ 版权类型（1=自制，2=转载）
+    "title": "粉丝寄啥我穿啥挑战！有点意思…", // ⭐ 视频标题
+    "review": 0,
+    "author": "金可鱼", // ⭐ UP主名称
+    "mid": 588753764, // ⭐用户ID（唯一标识）
+    "created": 1749477592, // ⭐ 发布时间戳（秒）
+    "length": "01:17", // ⭐ 视频时长
+    "video_review": 135, // ⭐ 弹幕数量
+    "aid": 114653749318583, // ⭐ 视频AV号
+    "bvid": "BV1PNTiz3EqG", // ⭐ 视频BV号
+    "hide_click": false,
+    "is_pay": 0,
+    "is_union_video": 0,
+    "is_steins_gate": 0,
+    "is_live_playback": 0,
+    "is_lesson_video": 0,
+    "is_lesson_finished": 0,
+    "lesson_update_info": "",
+    "jump_url": "",
+    "meta": null,
+    "is_avoided": 0,
+    "season_id": 0,
+    "attribute": 8405376,
+    "is_charging_arc": false,
+    "elec_arc_type": 0,
+    "elec_arc_badge": "",
+    "vt": 0,
+    "enable_vt": 0,
+    "vt_display": "",
+    "playback_position": 0,
+    "is_self_view": false,
+    "view_self_type": 0
+},
 ```
 
